@@ -424,11 +424,11 @@ window.addEventListener('DOMContentLoaded', function(){
                 const formData = new FormData(form);
 
                 //создаем чистый пустой объект и в него передаем все то, что было в инпутах formData
-                let userData = {};
+                // let userData = {};
                 //val - 'блабла' key - 'user_name'
-                formData.forEach((val, key) => {
-                    userData[key] = val;
-                });  
+                // formData.forEach((val, key) => {
+                //     userData[key] = val;
+                // });  
 
                 //вызываем postData и передаем в нее body, и 2 анонимные функции
                 // postData(body, () => {
@@ -438,39 +438,55 @@ window.addEventListener('DOMContentLoaded', function(){
                 //     console.error(error);
                 // });
 
-                postData(userData)
-                    .then(() => {statusMessage.textContent = successMessage;}) //это resolve
-                    .catch((error) => {console.error(error);}); //это reject
+                postData(formData)
+                    .then((response) => {
+                        if (response.status !== 200){
+                            throw new Error('status network is not 200');
+                        }
+                        statusMessage.textContent = successMessage;
+                    }) //это resolve
+                    .catch((error) => {
+                        statusMessage.textContent = errorMessage; 
+                        console.error(error);
+                    }); //это reject
             });
         });
 
         const postData = (userData) => {
 
-            return new Promise((resolve, reject) => {
-
-                const request = new XMLHttpRequest();
-                request.open('POST', './server.php');
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.addEventListener('readystatechange', () => {
-                    if(request.readyState !== 4) {
-                        return;
-                    }
-                    if (request.status === 200){
-                        resolve();
-                    } else {
-                        reject(request.status);              
-                    }
-                });
-
-                request.send(JSON.stringify(userData));
-
-                forms.forEach((form) => {
-                    form.querySelectorAll('input').forEach((input) => {
-                        input.value = '';
-                    }); 
-                });
-
+            return fetch('./server.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
             });
+
+            // return new Promise((resolve, reject) => {
+
+            //     const request = new XMLHttpRequest();
+            //     request.open('POST', './server.php');
+            //     request.setRequestHeader('Content-Type', 'application/json');
+            //     request.addEventListener('readystatechange', () => {
+            //         if(request.readyState !== 4) {
+            //             return;
+            //         }
+            //         if (request.status === 200){
+            //             resolve();
+            //         } else {
+            //             reject(request.status);              
+            //         }
+            //     });
+
+            //     request.send(JSON.stringify(userData));
+
+            //     forms.forEach((form) => {
+            //         form.querySelectorAll('input').forEach((input) => {
+            //             input.value = '';
+            //         }); 
+            //     });
+
+            // });
             
         };
 
