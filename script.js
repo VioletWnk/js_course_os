@@ -377,7 +377,7 @@ window.addEventListener('DOMContentLoaded', function(){
 
     calc(100);
 
-    //send FORM DATA
+    //отправка данных с формы
 
     const sendForm = () => {
         const errorMessage = 'Что-то пошло не так...',
@@ -404,7 +404,7 @@ window.addEventListener('DOMContentLoaded', function(){
                     let inputName = event.target.value.match(/[а-яА-Я\s]+/);
                     event.target.value = inputName[0];
                 } else if(event.target.matches('[name="user_message"]')){
-                    let inputMessage = event.target.value.match(/[а-яА-Я\s\d]+/);
+                    let inputMessage = event.target.value.match(/[а-яА-Я\s]+/);
                     event.target.value = inputMessage[0];
                 }
             });
@@ -418,42 +418,60 @@ window.addEventListener('DOMContentLoaded', function(){
                 event.preventDefault();
                 form.appendChild(statusMessage);
                 statusMessage.textContent = loadMessage;
+
+                //передаем в formData нашу форму, чтобы создать объект в кот ключ это name input'ов, 
+                //а значение value input'ов: {user_name: 'блабла', user_phone: '78787', user_email: 'dsfgh@ds.com'} 
                 const formData = new FormData(form);
-                let body = {};
+
+                //создаем чистый пустой объект и в него передаем все то, что было в инпутах formData
+                let userData = {};
+                //val - 'блабла' key - 'user_name'
                 formData.forEach((val, key) => {
-                    body[key] = val;
+                    userData[key] = val;
                 });  
-                postData(body, () => {
-                    statusMessage.textContent = successMessage;
-                }, (error) => {
-                    statusMessage.textContent = errorMessage;
-                    console.error(error);
-                });
+
+                //вызываем postData и передаем в нее body, и 2 анонимные функции
+                // postData(body, () => {
+                //     statusMessage.textContent = successMessage;
+                // }, (error) => {
+                //     statusMessage.textContent = errorMessage;
+                //     console.error(error);
+                // });
+
+                postData(userData)
+                    .then(() => {statusMessage.textContent = successMessage;}) //это resolve
+                    .catch((error) => {console.error(error);}); //это reject
             });
         });
 
-        const postData = (body, outputData, errorData) => {
-            const request = new XMLHttpRequest();
-            request.addEventListener('readystatechange', () => {
-                if(request.readyState !== 4) {
-                    return;
-                }
-                if (request.status === 200){
-                    outputData();
-                } else {
-                    errorData(request.status);              
-                }
-            });
+        const postData = (userData) => {
 
-            request.open('POST', './server.php');
-            request.setRequestHeader('Content-Type', 'application/json');
-            request.send(JSON.stringify(body));
-            forms.forEach((form) => {
-                form.querySelectorAll('input').forEach((input) => {
-                    input.value = '';
-                }); 
-            });
+            return new Promise((resolve, reject) => {
 
+                const request = new XMLHttpRequest();
+                request.open('POST', './server.php');
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.addEventListener('readystatechange', () => {
+                    if(request.readyState !== 4) {
+                        return;
+                    }
+                    if (request.status === 200){
+                        resolve();
+                    } else {
+                        reject(request.status);              
+                    }
+                });
+
+                request.send(JSON.stringify(userData));
+
+                forms.forEach((form) => {
+                    form.querySelectorAll('input').forEach((input) => {
+                        input.value = '';
+                    }); 
+                });
+
+            });
+            
         };
 
 
