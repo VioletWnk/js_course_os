@@ -15,6 +15,7 @@
   },
   "scripts": {
     "build": "webpack",
+    "watch": "webpack --watch",
     "dev": "webpack serve --config webpack.dev.config.js"
   },
   "repository": {

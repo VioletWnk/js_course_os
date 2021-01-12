@@ -5,18 +5,19 @@ const togglePopUp = () => {
  
     popupBtn.forEach((elem) => {
         elem.addEventListener('click', () => {
-            popup.style.display = 'block';
-            let count = -30;
-            popupContent.style.left = `${count}%`;
-
-        let timer = setInterval(() => {
-            if (count === 38) {
-                clearInterval(timer);
-            } else { 
-                popupContent.style.left = `${++count}%`;
-            }
-          }, 20);
-
+                popup.style.display = 'block';
+            if(document.documentElement.clientWidth > 768){
+                let count = -30;
+                popupContent.style.left = `${count}%`;
+    
+            let timer = setInterval(() => {
+                if (count === 38) {
+                    clearInterval(timer);
+                } else { 
+                    popupContent.style.left = `${++count}%`;
+                }
+              }, 20);
+            } 
         });
     });
 

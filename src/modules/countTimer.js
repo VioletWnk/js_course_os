@@ -28,7 +28,6 @@ function countTimer(deadline){
         let timer = getTimeRemaining();
 
         if(timer.timeRemaining <= 0){
-            clearInterval(idInterval);
             timerHours.textContent = '00';
             timerMinutes.textContent = '00';
             timerSeconds.textContent = '00';
@@ -36,10 +35,12 @@ function countTimer(deadline){
             timerHours.textContent =  verifyTime(timer.hours);
             timerMinutes.textContent =  verifyTime(timer.minutes);
             timerSeconds.textContent =  verifyTime(timer.seconds);
+            setTimeout(() => {
+                updateClock();
+            }, 1000);
         }
     }
-    
-    let idInterval = setInterval(updateClock, 1000);
+    updateClock();
 };
 
 export default countTimer;
